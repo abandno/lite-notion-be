@@ -1,0 +1,46 @@
+version: '3'
+services:
+  # app:
+  #   build: .
+  #   image: lite-notion-be
+  #   container_name: lite-notion-be
+  #   # command: ["/app/run.sh"]
+  #   volumes:
+  #     - E:/tmp/dc-app/log:/var/log
+  #   depends_on:
+  #     - db
+  #     # - redis
+  #   # 设置环境变量 dev|test|prod
+  #   # environment:
+  #   #   "SPRING_PROFILES_ACTIVE": "test"
+  #   ports:
+  #     - "8080:8080"
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: 4
+#          memory: 8G
+    # 似乎这个是有效的
+    #mem_limit: 6g
+    #cpus: 1
+  db:
+    container_name: lite-notion-mysql
+    image: mysql:5.7
+    volumes:
+      - E:/tmp/lite-notion/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: lite-notion
+      MYSQL_CHARSET: utf8mb4
+      # MYSQL_ALLOW_EMPTY_PASSWORD: true
+      TZ: Asia/Shanghai
+    ports:
+      - "33306:3306"
+
+  # redis:
+  #   container_name: redis
+  #   image: redis:latest
+  #   volumes:
+  #     - E:/tmp/weddingbefore/redis:/data
+  #   ports:
+  #     - "26379:6379"
