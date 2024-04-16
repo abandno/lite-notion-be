@@ -3,11 +3,10 @@ import {register} from 'tsconfig-paths';
 register();
 
 import {Ret} from "@/objects/Ret";
-import {Hocuspocus} from "@hocuspocus/server";
 import HocuspocusService from "@/service/HocuspocusService"
 
 const express = require('express');
-const ErrorCode = require("./config/ErrorCode");
+const {ErrorCode} = require("@/constants");
 const documentRoute = require('./routes/DocumentRoute'); // 引入新的路由文件
 require('express-async-errors');
 const {v4: uuidv4} = require('uuid');

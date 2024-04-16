@@ -1,7 +1,7 @@
-import {Ret} from "../objects/Ret";
+import {Ret} from "@/objects/Ret";
 const express = require('express');
 const router = express.Router();
-const {addDocument, deleteDocument} = require("../service/DocumentService");
+const {addDocument, deleteDocument} = require("@/service/DocumentService");
 
 router.post("/add", async (req, res) => {
   const result = await addDocument()

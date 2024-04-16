@@ -1,4 +1,4 @@
-const ErrorCode = require("../config/ErrorCode");
+const {ErrorCode} = require("@/constants");
 const Utils = require("@/utils")
 
 export class Ret {
