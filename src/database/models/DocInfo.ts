@@ -10,6 +10,9 @@ DocInfo.init({
     primaryKey: true,
     autoIncrement: true,
   },
+  title: {
+    type: DataTypes.STRING(255),
+  },
   userId: { // 通常将列名 user_id 改为驼峰式命名的 userId 在 JavaScript 中使用
     type: DataTypes.BIGINT,
     allowNull: true,

@@ -4,7 +4,6 @@ import {SQLiteConfiguration} from "@hocuspocus/extension-sqlite/src/SQLite";
 
 export const schema = `CREATE TABLE IF NOT EXISTS doc_content (
   id bigint(20) unsigned NOT NULL COMMENT '文档id',
-  title varchar(255) DEFAULT NULL COMMENT '文章标题',
   content mediumblob COMMENT '文档内容',
   created_at datetime(3) DEFAULT CURRENT_TIMESTAMP(3) COMMENT '创建时间',
   created_by varchar(255) DEFAULT NULL COMMENT '创建者',
@@ -19,8 +18,8 @@ export const selectQuery = `
 `
 
 export const upsertQuery = `
-  INSERT INTO doc_content (id, title, content) VALUES (?, ?, ?)
-    ON DUPLICATE KEY UPDATE content = VALUES(content), title = VALUES(title)
+  INSERT INTO doc_content (id, content) VALUES (?, ?)
+    ON DUPLICATE KEY UPDATE content = VALUES(content)
 `
 
 export interface MySQLConfiguration extends DatabaseConfiguration {
@@ -51,6 +50,7 @@ export class MySQL extends Database {
       return rows[0]?.content
     },
     store: async ({ documentName, state }) => {
+      console.log("===== Mysql store documentName", documentName);
       await this.connection?.execute(upsertQuery, [documentName, state])
     },
   }
