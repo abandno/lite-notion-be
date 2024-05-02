@@ -5,7 +5,8 @@
   "entry": "src/index.ts",
   "scripts": {
     "start": "node --conditions=source --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node src/App.ts",
-    "dev": "nodemon --inspect -e ts --watch ./src/* --watch ./ --exec npm start"
+    "dev": "nodemon --inspect -e ts --watch ./src/* --exec npm start",
+    "dev__bak": "nodemon --inspect -e ts --watch ./src/* --watch ./ --exec npm start"
   },
   "dependencies": {
     "@hocuspocus/extension-logger": "^2.11.2",

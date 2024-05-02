@@ -15,10 +15,20 @@ async function deleteDocument() {
   return {}
 }
 
-async function listDocument() {
-  return await DocInfo.findAll({
+/**
+ *
+ * @param params {level: 0}
+ */
+async function listDocument(params) {
+  const {level = 0, pid} = params;
+  let options = {
+    where: {
+      level,
+      ...(pid != null && { pid })
+    },
     limit: 100,
-  })
+  };
+  return await DocInfo.findAll(options);
 }
 
 module.exports = {

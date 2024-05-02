@@ -15,7 +15,8 @@ router.post("/delete", async (req, res) => {
 })
 
 router.get("/list", async (req, res) => {
-  const result = await listDocument()
+  const params = req.query;
+  const result = await listDocument(params)
 
   res.send(Ret.success(result))
 })

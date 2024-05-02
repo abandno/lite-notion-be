@@ -10,11 +10,27 @@ DocInfo.init({
     primaryKey: true,
     autoIncrement: true,
   },
+  pid: {
+    type: DataTypes.BIGINT.UNSIGNED,
+    allowNull: false,
+  },
   title: {
     type: DataTypes.STRING(255),
   },
   userId: { // 通常将列名 user_id 改为驼峰式命名的 userId 在 JavaScript 中使用
     type: DataTypes.BIGINT,
+    allowNull: true,
+  },
+  level: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  type: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  subSize: {
+    type: DataTypes.INTEGER,
     allowNull: true,
   },
   isDeleted: {
