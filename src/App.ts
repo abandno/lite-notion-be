@@ -4,6 +4,7 @@ register();
 
 import {Ret} from "@/objects/Ret";
 import HocuspocusService from "@/service/HocuspocusService"
+import {TipError} from "@/utils/exceptions";
 
 const express = require('express');
 const {ErrorCode} = require("@/constants");
@@ -22,7 +23,7 @@ app.use(cors());
 // 使用 express.json() 中间件
 app.use(express.json());
 app.use((req, res, next) => {
-  const requestId = res.locals.requestId = req.headers['x-fc-request-id'] || uuidv4();
+  res.locals.requestId = req.headers['x-request-id'] || uuidv4().replaceAll("-", "");
   const originalJson = res.json.bind(res);
   res.json = function (data) {
     if (data && typeof data === 'object') {
@@ -31,7 +32,7 @@ app.use((req, res, next) => {
     return originalJson(data);
   };
   // res.setHeader('X-Fc-Request-Id', requestId);
-  // res.setHeader('X-Request-ID', requestId);
+  res.setHeader('X-Request-ID', res.locals.requestId );
   next();
 });
 
@@ -67,7 +68,18 @@ app.use('/api/document', documentRoute);
 // 异常捕获中间件务必放到最后加入
 app.use((err, req, res, next) => {
   console.error(err.stack); // 打印错误堆栈到控制台
-  res.status(500).send(Ret.fail(null).appendError(err.message));
+  if (err instanceof TipError) {
+    const ret = new Ret(err.code, err.message, null);
+    ret.error = err.error
+    res.status(200).send(ret);
+    return;
+  }
+  // 未知错误
+  res.status(500).send(
+      Ret.fail(null)
+          .setMsg("系统繁忙, 请稍后重试")
+          .appendError(err.message)
+  );
 });
 app.use((req, res, next) => {
   const ret = Ret.fail(null, ErrorCode.INVALID_REQUEST).appendError(`未找到资源: ${req.method} ${req.originalUrl}`);

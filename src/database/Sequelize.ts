@@ -13,3 +13,15 @@ export const sequelize = new Sequelize({
   ...config,
 });
 
+export const doTransaction = async (func) => {
+  let t;
+  try {
+    t = await sequelize.transaction();
+    const res = await func(t);
+    await t.commit();
+    return res;
+  } catch (e) {
+    if (t) await t.rollback();
+    throw e;
+  }
+}

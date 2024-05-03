@@ -22,6 +22,11 @@ export class Ret {
     return new Ret(code, msg, data)
   }
 
+  setMsg(msg: string) {
+    this.msg = msg
+    return this;
+  }
+
   appendError(error: string) {
     this.error = Utils.join(";", this.error, error)
     return this;
