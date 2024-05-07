@@ -37,6 +37,12 @@ DocInfo.init({
     type: DataTypes.TINYINT({length:1}),
     allowNull: true,
   },
+  sort: {
+    type: DataTypes.DECIMAL
+  },
+  isShare: {
+    type: DataTypes.TINYINT
+  },
   createdAt: {
     type: DataTypes.DATE(3), // 或者使用 DataTypes.DATEONLY / DataTypes.DATE(0) 如果不需要时间部分
     allowNull: true,

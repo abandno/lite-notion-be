@@ -1,6 +1,7 @@
-import {DocInfo} from "@/database/models/DocInfo";
+import {DocInfo, DocSpace} from "@/database/models";
 import {doTransaction} from "@/database/Sequelize";
 import {TipError} from "@/utils/exceptions";
+import {OrderItem} from "sequelize";
 
 const getInitName = (type) => {
   if (type === "1") {
@@ -15,11 +16,11 @@ const getInitName = (type) => {
 /**
  *
  */
-async function addDocument({pid, type, level}) {
+export async function addDocument({pid, type, level, sort}) {
   return doTransaction(async () => {
     // 生成文档, 返回文档id
     // doc_info 表新增一条记录, 自增id, 返回
-    const docInfo = await DocInfo.create({userId: 1, title: getInitName(type), pid, type, level});
+    const docInfo = await DocInfo.create({userId: 1, title: getInitName(type), pid, type, level, sort});
 
     // pid 对应的 subSize 增1
     if (pid != null) {
@@ -32,7 +33,7 @@ async function addDocument({pid, type, level}) {
   });
 }
 
-async function deleteDocument({id}) {
+export async function deleteDocument({id}) {
   // 还有子文档, 暂不允许删除
   const subSize = await DocInfo.count({where: {pid: id}})
   if (subSize) {
@@ -55,21 +56,47 @@ async function deleteDocument({id}) {
  *
  * @param params {level: 0}
  */
-async function listDocument(params) {
+export async function listDocument(params) {
   const {userId, level = 0, pid} = params;
+  // 空间列表, 构造节点
+  const docSpaces = await DocSpace.findAll();
+  const nodes = docSpaces.map(e => {
+    const row = e.dataValues;
+    return {
+      id: row.id,
+      title: row.name,
+      pid: 0,
+    }
+  })
+
   let options = {
     where: {
       isDeleted: 0,
       userId,
       ...(pid != null && {pid})
     },
+    order: [
+      ['sort', 'ASC']
+    ] as OrderItem[],
     limit: 100,
   };
-  return await DocInfo.findAll(options);
+  const docList = await DocInfo.findAll(options);
+  docList.forEach(e => {
+    const row = e.dataValues;
+    nodes.push(row);
+  })
+  return nodes;
 }
 
-module.exports = {
-  addDocument,
-  deleteDocument,
-  listDocument,
+export async function moveNode({node, prevPid}) {
+  return doTransaction(async () => {
+    await DocInfo.update({...node}, {
+      where: {
+        id: node.id
+      }
+    })
+    await DocInfo.increment('subSize', {where: {id: node.pid}})
+    await DocInfo.decrement('subSize', {where: {id: prevPid}})
+  })
 }
+

@@ -2,7 +2,7 @@ import {Ret} from "@/objects/Ret";
 
 const express = require('express');
 const router = express.Router();
-const {addDocument, deleteDocument, listDocument} = require("@/service/DocumentService");
+import {addDocument, deleteDocument, listDocument, moveNode} from "@/service/DocumentService"
 
 class RouterWrapper {
   private router: any;
@@ -49,6 +49,10 @@ router.get("/list", async (req, res) => {
   const result = await listDocument(params)
 
   res.send(Ret.success(result))
+})
+
+routerWrapper.post("/moveNode", async (req) => {
+  return await moveNode(req.body)
 })
 
 module.exports = router;
