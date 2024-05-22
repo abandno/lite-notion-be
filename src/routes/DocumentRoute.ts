@@ -2,7 +2,10 @@ import {Ret} from "@/objects/Ret";
 
 const express = require('express');
 const router = express.Router();
-import {addDocument, deleteDocument, listDocument, moveNode} from "@/service/DocumentService"
+import {
+  addDocument, deleteDocument, listDocument, moveNode,
+  updateDocInfo, getDocInfo
+} from "@/service/DocumentService"
 
 class RouterWrapper {
   private router: any;
@@ -53,6 +56,16 @@ router.get("/list", async (req, res) => {
 
 routerWrapper.post("/moveNode", async (req) => {
   return await moveNode(req.body)
+})
+
+// 重命名文档 title
+routerWrapper.post("/updateDocInfo", async (req, res) => {
+  return await updateDocInfo(req.body)
+})
+
+// docInfo by Id
+routerWrapper.get("/docInfo", async (req, res) => {
+  return await getDocInfo(req.query)
 })
 
 module.exports = router;
