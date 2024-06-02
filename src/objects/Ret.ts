@@ -1,5 +1,5 @@
 const {ErrorCode} = require("@/constants");
-const Utils = require("@/utils")
+import {join} from "@/utils";
 
 export class Ret {
   requestId:string;
@@ -28,7 +28,7 @@ export class Ret {
   }
 
   appendError(error: string) {
-    this.error = Utils.join(";", this.error, error)
+    this.error = join(";", this.error, error)
     return this;
   }
 

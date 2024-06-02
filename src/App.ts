@@ -5,10 +5,11 @@ register();
 import {Ret} from "@/objects/Ret";
 import HocuspocusService from "@/service/HocuspocusService"
 import {TipError} from "@/utils/exceptions";
+import { userRouter } from './routes/UserRoute';
+import { documentRouter } from './routes/DocumentRoute';
 
 const express = require('express');
 const {ErrorCode} = require("@/constants");
-const documentRoute = require('./routes/DocumentRoute'); // 引入新的路由文件
 require('express-async-errors');
 const {v4: uuidv4} = require('uuid');
 const cors = require('cors');
@@ -62,7 +63,8 @@ app.get("/", async (req, res) => {
 
 
 //region 配置业务路由分组
-app.use('/api/document', documentRoute);
+app.use('/api/document', documentRouter);
+app.use('/api/user', userRouter)
 //endregion
 
 // 异常捕获中间件务必放到最后加入

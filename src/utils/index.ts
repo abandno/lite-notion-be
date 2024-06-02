@@ -3,7 +3,7 @@
  * @param joiner
  * @param eles
  */
-const join = (joiner: string, ...eles): string => {
+export const join = (joiner: string, ...eles): string => {
   let ret = "";
   for (const e of eles) {
     if (e == null) {
@@ -17,6 +17,17 @@ const join = (joiner: string, ...eles): string => {
   return ret;
 }
 
-module.exports = {
-  join,
+// 定义数字字符集
+const NUMBERS = '0123456789';
+
+// 生成4位随机数字验证码
+export function randomNumber(length) {
+  let code = '';
+
+  // 循环生成随机数字
+  for (let i = 0; i < length; i++) {
+    code += NUMBERS[Math.floor(Math.random() * NUMBERS.length)];
+  }
+
+  return code;
 }

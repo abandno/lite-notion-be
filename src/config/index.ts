@@ -12,7 +12,6 @@ const configByEnv = process.env.NODE_ENV === "production" ? ProdConfig : DevConf
 
 const config = {
   // 通用配置
-
   // 分环境配置
   ...configByEnv,
 };
