@@ -2,7 +2,7 @@
   "name": "lete-notion-be",
   "version": "0.1.0",
   "private": true,
-  "entry": "src/index.ts",
+  "entry__del": "src/index.ts",
   "scripts": {
     "start": "node --conditions=source --no-warnings --loader ts-node/esm --experimental-specifier-resolution=node src/App.ts",
     "dev": "nodemon --inspect -e ts --watch ./src/* --exec npm start",
@@ -23,6 +23,7 @@
     "@types/express-ws": "^3.0.1",
     "@types/node": "^16.11.11",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.17.3",
     "express-async-errors": "^3.1.1",
     "express-ws": "^5.0.2",

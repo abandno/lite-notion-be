@@ -44,7 +44,8 @@ export class SmsClient {
     let sendSmsRequest = new $Dysmsapi20170525.SendSmsRequest({
       phoneNumbers: phone,
       // signName: "微念",
-      signName: "宠爱",
+      // signName: "宠爱",
+      signName: "微念",
       templateCode: "SMS_119085964",
       templateParam: `{\"code\":\"${vcode}\"}`,
     });

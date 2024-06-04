@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken';
 import {JWT_SECRET} from "@/constants";
 import {SmsClient} from "@/service/aliyun/sms";
-import {randomNumber} from "@/utils";
+import {randomNickname, randomNumber} from "@/utils";
 import {CACHE} from "@/cache";
 import {TipError} from "@/utils/exceptions";
+import {User} from "@/database/models/User";
 
 function generateToken(payload: object, secret: string, expiresIn: string | number) {
     return jwt.sign(payload, secret, { expiresIn });
@@ -33,10 +34,21 @@ export async function codeSignIn({ phone, code }) {
     if (cacheCode != code) {
         throw new TipError("验证码错误")
     }
-    const user = { userId: '123', nickname: 'John Doe', phone: '189', avatar: "abc.png" };
+
+    // 根据 phone 查询 User, 无则新增
+    let userInfo = null;
+    const oldUser = userInfo = await User.findOne({where: { phone }})
+    if (!oldUser) {
+        const newUser = userInfo = await User.create({
+            phone,
+            nickname: randomNickname(phone)
+        });
+    }
+    console.log("userInfo", userInfo);
+    const userJwt = { userId: userInfo.id, nickname: userInfo.nickname, avatar: userInfo.avatar };
     return {
-        user,
-        accessToken: generateToken(user, JWT_SECRET, '10s'),
-        refreshToken: generateToken(user, JWT_SECRET, '30s'),
+        user: userJwt,
+        accessToken: generateToken(userJwt, JWT_SECRET, '10s'),
+        refreshToken: generateToken(userJwt, JWT_SECRET, '30s'),
     }
 }

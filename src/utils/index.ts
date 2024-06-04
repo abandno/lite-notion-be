@@ -31,3 +31,15 @@ export function randomNumber(length) {
 
   return code;
 }
+
+
+const ALPHABET_UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+export function randomNickname(phoneNumber) {
+  let randomAlpha = '';
+  for (let i = 0; i < 4; i++) {
+    randomAlpha += ALPHABET_UPPER[Math.floor(Math.random() * ALPHABET_UPPER.length)];
+  }
+  const suffix = phoneNumber.slice(-4);
+  return `${randomAlpha}${suffix}`;
+}
