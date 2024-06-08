@@ -66,7 +66,7 @@ User.init({
   sequelize, // 假设此处的 sequelize 已经正确实例化
   tableName: 'user',
   timestamps: false, // 假设原表没有自动管理的时间戳字段
-  underscored: false, // 原表使用的是驼峰命名，所以这里设置为false
+  underscored: true, // 原表使用的是驼峰命名，所以这里设置为false
   paranoid: false, // 表中有is_deleted字段的话应启用，但根据原表结构，此表未包含逻辑删除字段，故设为false
   comment: '用户表', // 添加表注释
 });

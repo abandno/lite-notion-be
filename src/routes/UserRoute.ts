@@ -1,11 +1,15 @@
-import {codeSignIn, sendVerifyCode, signIn} from "@/service/UserService"
+import {codeSignIn, passwordSignIn, resetPassword, sendVerifyCode} from "@/service/UserService"
 import { createRouter } from "./RouterWrapper"
 
 const routerW = createRouter()
 export const userRouter = routerW.Router();
 
-routerW.post("/auth/signin", async (req, res) => {
-    return await signIn(req.body)
+routerW.post("/auth/passwordSignIn", async (req, res) => {
+    return await passwordSignIn(req.body)
+})
+
+routerW.post("/auth/resetPassword", async (req, res) => {
+    return await resetPassword(req.body)
 })
 
 routerW.post("/auth/sendVerifyCode", async (req, res) => {

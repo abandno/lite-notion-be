@@ -27,16 +27,23 @@ app.use(cors());
 // 使用 express.json() 中间件
 app.use(express.json());
 app.use((req, res, next) => {
+  const start = Date.now();
   res.locals.requestId = req.headers['x-request-id'] || uuidv4().replaceAll("-", "");
   const originalJson = res.json.bind(res);
   res.json = function (data) {
     if (data && typeof data === 'object') {
+      // 自动注入 requestId 响应字段
       data.requestId = res.locals.requestId;
     }
     return originalJson(data);
   };
   // res.setHeader('X-Fc-Request-Id', requestId);
   res.setHeader('X-Request-ID', res.locals.requestId );
+  // 监听response的'finish'事件，该事件在响应数据完全发送给客户端后触发
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    console.log(`Request Path: ${req.path}, Duration: ${duration}ms`);
+  });
   next();
 });
 
@@ -72,7 +79,8 @@ app.use('/api/user', userRouter)
 
 // 异常捕获中间件务必放到最后加入
 app.use((err, req, res, next) => {
-  console.error(err.stack); // 打印错误堆栈到控制台
+  // console.error(err.stack); // 打印错误堆栈到控制台
+  console.error(err); // 打印错误堆栈到控制台
   if (err instanceof TipError) {
     const ret = new Ret(err.code, err.message, null);
     ret.error = err.error
