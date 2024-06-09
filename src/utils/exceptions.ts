@@ -9,4 +9,8 @@ export class TipError extends Error {
     this.error = error;
   }
 
+  prettyString() {
+    return `${this.code}:${this.message}:${this.error}`
+  }
+
 }

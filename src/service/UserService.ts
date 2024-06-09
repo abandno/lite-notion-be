@@ -4,7 +4,7 @@ import {SmsClient} from "@/service/aliyun/sms";
 import {randomNickname, randomNumber} from "@/utils";
 import {CACHE} from "@/cache";
 import {TipError} from "@/utils/exceptions";
-import {User} from "@/database/models/User";
+import User from "@/database/models/User";
 import CryptoJS from "crypto-js";
 
 function generateToken(payload: object, secret: string, expiresIn: string | number) {
@@ -20,7 +20,12 @@ export async function passwordSignIn({username, password }) {
     }
 
     // 比对密码
-    const split = userInfo.password.split(":");
+    let dbPassword = userInfo.password;
+    if (!dbPassword) {
+        throw new TipError("暂无密码, 请先设置密码")
+    }
+
+    const split = dbPassword.split(":");
     const derivedKey = CryptoJS.PBKDF2(password, split[2], {
         keySize: 8,
         // iterations: 100000,
@@ -31,7 +36,7 @@ export async function passwordSignIn({username, password }) {
         throw new TipError("密码错误");
     }
 
-    const userJwt = { userId: userInfo.id, nickname: userInfo.nickname, avatar: userInfo.avatar };
+    const userJwt = { id: userInfo.id, nickname: userInfo.nickname, avatar: userInfo.avatar };
 
     return {
         user: userJwt,
@@ -40,15 +45,18 @@ export async function passwordSignIn({username, password }) {
     }
 }
 
-export async function resetPassword({userId, phone, code, password}) {
+export async function resetPassword({phone, code, password}) {
     const cacheCode = CACHE.get(`VerifyCode:ResetPassword:${phone}`)
     if (cacheCode != code) {
         // TODO throw new TipError("验证码错误")
     }
 
+    // 如果新 phone, 自动注册为新手机用户; 然后, 重置密码(即初次设置密码)
+    const userInfo = await createPhoneUserIfNone(phone);
+
     const t = new Date().getTime()
     const iterations = 1000
-    const salt = CryptoJS.lib.WordArray.random(16); // 生成随机的盐值
+    const salt = CryptoJS.lib.WordArray.random(16).toString(CryptoJS.enc.Base64); // 生成随机的盐值
     const derivedKey = CryptoJS.PBKDF2(password, salt, {
         keySize: 8,
         // iterations: 100000,
@@ -62,12 +70,15 @@ export async function resetPassword({userId, phone, code, password}) {
     // 更新密码
     await User.update({ password: passwordHash }, {
         where: {
-            id: userId
+            id: userInfo.id
         }
     })
 }
 
 export async function sendVerifyCode({ phone, type }) {
+    if (!phone) {
+        return
+    }
     // 随机4位验证码
     const code = randomNumber(4)
     CACHE.set(`VerifyCode:${type}:${phone}`, code, 60 * 30)
@@ -84,18 +95,28 @@ export async function codeSignIn({ phone, code }) {
 
     // 根据 phone 查询 User, 无则新增
     let userInfo = null;
-    const oldUser = userInfo = await User.findOne({where: { phone }})
-    if (!oldUser) {
-        const newUser = userInfo = await User.create({
-            phone,
-            nickname: randomNickname(phone)
-        });
-    }
+    userInfo = await createPhoneUserIfNone(phone);
     console.log("userInfo", userInfo);
-    const userJwt = { userId: userInfo.id, nickname: userInfo.nickname, avatar: userInfo.avatar };
+    const userJwt = { id: userInfo.id, nickname: userInfo.nickname, avatar: userInfo.avatar };
     return {
         user: userJwt,
         accessToken: generateToken(userJwt, JWT_SECRET, '10s'),
         refreshToken: generateToken(userJwt, JWT_SECRET, '30s'),
     }
+}
+
+/**
+ * 如果不存在, 自动新增手机用户
+ * @param phone
+ */
+async function createPhoneUserIfNone(phone) {
+    let ret = await User.findOne({where: {phone}})
+    if (!ret) {
+        ret = await User.create({
+            phone,
+            nickname: randomNickname(phone)
+        });
+        console.log(`新增 phone user: ${ret}`);
+    }
+    return ret;
 }

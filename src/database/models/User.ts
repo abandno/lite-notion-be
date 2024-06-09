@@ -1,9 +1,8 @@
 import { DataTypes, Model } from "sequelize";
 import { sequelize } from "@/database/Sequelize";
 
-export class User extends Model {}
-
-User.init({
+class User extends Model {}
+export default User.init<any,any>({
   id: {
     type: DataTypes.BIGINT.UNSIGNED,
     allowNull: false,

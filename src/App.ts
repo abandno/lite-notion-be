@@ -42,7 +42,7 @@ app.use((req, res, next) => {
   // 监听response的'finish'事件，该事件在响应数据完全发送给客户端后触发
   res.on('finish', () => {
     const duration = Date.now() - start;
-    console.log(`Request Path: ${req.path}, Duration: ${duration}ms`);
+    console.log(`Request Path: ${req.path}, cost: ${duration}ms`);
   });
   next();
 });
@@ -80,13 +80,14 @@ app.use('/api/user', userRouter)
 // 异常捕获中间件务必放到最后加入
 app.use((err, req, res, next) => {
   // console.error(err.stack); // 打印错误堆栈到控制台
-  console.error(err); // 打印错误堆栈到控制台
   if (err instanceof TipError) {
+    console.error(err.prettyString())
     const ret = new Ret(err.code, err.message, null);
     ret.error = err.error
     res.status(200).send(ret);
     return;
   }
+  console.error(err); // 打印错误堆栈到控制台
   // 未知错误
   res.status(500).send(
       Ret.fail(null)
